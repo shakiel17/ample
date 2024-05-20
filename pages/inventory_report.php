@@ -73,14 +73,15 @@
 			<thead>
 				<th>#</th>
 				<th>Item Name</th>
-				<th>SOH</th>
-				<th>Qty Sold</th>				
+        <th>Qty Purchased</th>
+        <th>Qty Sold</th>				
+				<th>SOH</th>				
 			</thead>
 			<tbody>
 				<?php
         //require_once '../app/init.php';
         $x=1;
-        $products=$pdo->prepare("SELECT p.product_name,SUM(id.quantity) as qtysold,p.quantity as soh FROM products p LEFT JOIN invoice_details id ON id.pid=p.id GROUP BY p.id ORDER BY p.product_name");
+        $products=$pdo->prepare("SELECT p.product_name,SUM(id.quantity) as qtysold,p.quantity as soh,SUM(po.purchase_quantity) as stockin FROM products p LEFT JOIN invoice_details id ON id.pid=p.id LEFT JOIN purchase_products po ON po.product_id=p.id GROUP BY p.id ORDER BY p.product_name");
         $products->execute();
         $res = $products->fetchAll(PDO::FETCH_OBJ);
         foreach($res as $item){
@@ -89,11 +90,17 @@
           }else{
             $qty=$item->qtysold;
           }
+          if($item->stockin==""){
+            $stockin=0;
+          }else{
+            $stockin=$item->stockin;
+          }
           echo "<tr>";
             echo "<td>$x.</td>";
-            echo "<td>$item->product_name</td>";
-            echo "<td align='center'>$item->soh</td>";
+            echo "<td>$item->product_name</td>";      
+            echo "<td align='center'>$stockin</td>";
             echo "<td align='center'>$qty</td>";
+            echo "<td align='center'>$item->soh</td>";
           echo "</tr>";
           $x++;
         }
