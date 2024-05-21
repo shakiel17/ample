@@ -95,6 +95,9 @@
           }else{
             $stockin=$item->stockin;
           }
+          if($qty+$item->soh <> $stockin){
+            $stockin = $item->soh+$qty;
+          }
           echo "<tr>";
             echo "<td>$x.</td>";
             echo "<td>$item->product_name</td>";      
