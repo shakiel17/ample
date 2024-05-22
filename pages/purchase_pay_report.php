@@ -75,6 +75,7 @@
         <th>payment date</th>
         <th>Supplier id</th>
         <th>Supplier name</th>
+        <th>Items</th>
         <th>Payment type</th>
         <th>paid amount</th>
       </thead>

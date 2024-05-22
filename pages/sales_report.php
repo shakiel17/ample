@@ -77,6 +77,7 @@
 				<th>Sales date</th>
 				<th>customer id</th>
 				<th>customer name</th>
+        <th>Items</th>
 				<th>invoice total</th>
 				<th>Paid paymen</th>
 				<th>Due amount</th>

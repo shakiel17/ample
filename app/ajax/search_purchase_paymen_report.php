@@ -8,7 +8,7 @@ require_once '../init.php';
 		$data = explode('-', $issueData);
 	  $issu_first_date = $obj->convertDateMysql($data[0]);
 		$issu_end_date = $obj->convertDateMysql($data[1]);
-
+$qty=0;
       if ($customer == 'all') {
     $stmt = $pdo->prepare("
         SELECT purchase_payment.`payment_date`,purchase_payment.`suppliar_id`, suppliar.name , purchase_payment.`payment_amount` , purchase_payment.`payment_type` FROM purchase_payment INNER JOIN suppliar ON purchase_payment.suppliar_id = suppliar.id WHERE `payment_date` BETWEEN '$issu_first_date' AND '$issu_end_date';
@@ -21,12 +21,23 @@ require_once '../init.php';
           $i=0;
               foreach ($res as $data) {
                 $i++;
+                $items=""; 
+                $query=$pdo->prepare("SELECT * FROM purchase_products WHERE purchase_suppliar='$data->suppliar_id' AND purchase_date='$data->payment_date'");
+                $query->execute();
+                $result=$query->fetchAll(PDO::FETCH_OBJ);
+                if($result){
+                  foreach($result as $row){
+                    $items .=$row->purchase_quantity." - ".$row->product_name."<br>";;
+                    $qty += $row->purchase_quantity;
+                  }
+                }
                 ?>
                   <tr>
                     <td><?=$i;?></td>
                     <td><?=$data->payment_date;?></td>
                     <td><?=$data->suppliar_id;?></td>
                     <td><?=$data->name;?></td>
+                    <td><?=$items;?></td>
                     <td><?=$data->payment_type;?></td>
                     <td><?=$data->payment_amount;?></td>
                   </tr>
@@ -37,8 +48,8 @@ require_once '../init.php';
           <th></th>
           <th></th>
           <th></th>
-          <th></th>
-          <th>Total : </th>
+          <th></th>          
+          <th>Total : <?=$qty;?></th>
           <th>
            <?php 
                   $stmt = $pdo->prepare("SELECT SUM(`payment_amount`) FROM `purchase_payment` WHERE `payment_date` BETWEEN '$issu_first_date' AND '$issu_end_date'");
@@ -65,12 +76,23 @@ require_once '../init.php';
           $i=0;
              foreach ($res as $data) {
                 $i++;
+                $items=""; 
+                $query=$pdo->prepare("SELECT * FROM purchase_products WHERE purchase_suppliar='$data->suppliar_id' AND purchase_date='$data->payment_date'");
+                $query->execute();
+                $result=$query->fetchAll(PDO::FETCH_OBJ);
+                if($result){
+                  foreach($result as $row){
+                    $items .=$row->purhcase_quantity." - ".$row->product_name."<br>";;
+                    $qty += $row->purchase_quantity;
+                  }
+                }
                 ?>
                   <tr>
                     <td><?=$i;?></td>
                     <td><?=$data->payment_date;?></td>
                     <td><?=$data->suppliar_id;?></td>
                     <td><?=$data->name;?></td>
+                    <td><?=$items;?></td>
                     <td><?=$data->payment_type;?></td>
                     <td><?=$data->payment_amount;?></td>
                   </tr>
@@ -80,9 +102,9 @@ require_once '../init.php';
         <tr>
           <th></th>
           <th></th>
+          <th></th>          
           <th></th>
-          <th></th>
-          <th>Total : </th>
+          <th>Total : <?=$qty;?></th>
           <th>
              <?php  
                 $stmt = $pdo->prepare("SELECT SUM(`payment_amount`) FROM `purchase_payment` WHERE `payment_date` BETWEEN '$issu_first_date' AND '$issu_end_date' AND `suppliar_id` = $customer");

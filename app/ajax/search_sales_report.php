@@ -8,7 +8,7 @@ require_once '../init.php';
 		$data = explode('-', $issueData);
 	  $issu_first_date = $obj->convertDateMysql($data[0]);
 		$issu_end_date = $obj->convertDateMysql($data[1]);
-
+    $qty=0;
 	if ($customer == 'all') {
     $stmt = $pdo->prepare("SELECT * FROM `invoice` WHERE `order_date` BETWEEN '$issu_first_date' AND '$issu_end_date'");
     $stmt->execute();
@@ -19,6 +19,16 @@ require_once '../init.php';
           $i=0;
               foreach ($res as $data) {
                 $i++;
+                $items="";                
+                $query=$pdo->prepare("SELECT * FROM invoice_details WHERE invoice_no='$data->id'");
+                $query->execute();
+                $result=$query->fetchAll(PDO::FETCH_OBJ);
+                if($result){
+                  foreach($result as $row){
+                    $items .=$row->quantity." - ".$row->product_name."<br>";;
+                    $qty += $row->quantity;
+                  }
+                }
                 ?>
                   <tr>
                     <td><?=$i;?></td>
@@ -26,6 +36,7 @@ require_once '../init.php';
                     <td><?=$data->order_date;?></td>
                     <td><?=$data->customer_id;?></td>
                     <td><?=$data->customer_name;?></td>
+                    <td><?=$items;?></td>
                     <td><?=$data->net_total;?></td>
                     <td><?=$data->paid_amount;?></td>
                     <td><?=$data->due_amount;?></td>
@@ -38,7 +49,8 @@ require_once '../init.php';
           <th></th>
           <th></th>
           <th></th>
-          <th>Total : </th>
+          <th></th>
+          <th>Total : <?=$qty;?></th>
           <th> 
             <?php  
                 $stmt = $pdo->prepare("SELECT SUM(`net_total`) FROM `invoice` WHERE `order_date` BETWEEN '$issu_first_date' AND '$issu_end_date' ");
@@ -80,6 +92,16 @@ require_once '../init.php';
           $i=0;
               foreach ($res as $data) {
                 $i++;
+                $items=""; 
+                $query=$pdo->prepare("SELECT * FROM invoice_details WHERE invoice_no='$data->id'");
+                $query->execute();
+                $result=$query->fetchAll(PDO::FETCH_OBJ);
+                if($result){
+                  foreach($result as $row){
+                    $items .=$row->quantity." - ".$row->product_name."<br>";;
+                    $qty += $row->quantity;
+                  }
+                }
                 ?>
                    <tr>
                     <td><?=$i;?></td>
@@ -87,6 +109,7 @@ require_once '../init.php';
                     <td><?=$data->order_date;?></td>
                     <td><?=$data->customer_id;?></td>
                     <td><?=$data->customer_name;?></td>
+                    <td><?=$items;?></td>
                     <td><?=$data->net_total;?></td>
                     <td><?=$data->paid_amount;?></td>
                     <td><?=$data->due_amount;?></td>
@@ -99,7 +122,8 @@ require_once '../init.php';
           <th></th>
           <th></th>
           <th></th>
-          <th>Total : </th>
+          <th></th>
+          <th>Total : <?=$qty;?></th>
           <th>
              <?php  
                 $stmt = $pdo->prepare("SELECT SUM(`net_total`) FROM `invoice` WHERE `order_date` BETWEEN '$issu_first_date' AND '$issu_end_date' AND `customer_id` = $customer");
